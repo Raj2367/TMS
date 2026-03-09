@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
+import { Schema } from "mongoose";
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: {
