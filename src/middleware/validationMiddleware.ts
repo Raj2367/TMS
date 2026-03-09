@@ -1,0 +1,22 @@
+import { NextRequest } from "next/server";
+import { ZodSchema } from "zod/v3";
+
+export async function validateRequest<T>(
+  req: NextRequest,
+  schema: ZodSchema<T>
+): Promise<T> {
+  const body = await req.json();
+
+  const result = schema.safeParse(body);
+
+  if (!result.success) {
+    const errors = result.error.errors.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    }));
+
+    throw new Error(JSON.stringify(errors));
+  }
+
+  return result.data;
+}
