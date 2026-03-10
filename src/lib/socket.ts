@@ -1,6 +1,7 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 let io: Server | null = null;
+const projectPresence: Map<string, Set<string>> = new Map();
 
 export function initSocket(server: any) {
   if (io) return io;
@@ -12,19 +13,35 @@ export function initSocket(server: any) {
     },
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
 
-    socket.on("joinProject", (projectId: string) => {
+    socket.on("joinProject", ({ projectId, userId }) => {
       const room = `project:${projectId}`;
       socket.join(room);
 
-      console.log(`Socket ${socket.id} joined ${room}`);
+      if (!projectPresence.has(projectId)) {
+        projectPresence.set(projectId, new Set());
+      }
+      projectPresence.get(projectId)?.add(userId);
+
+      io?.to(room).emit("presenceUpdate", {
+        projectId,
+        users: Array.from(projectPresence.get(projectId) || []),
+      });
     });
 
-    socket.on("leaveProject", (projectId: string) => {
+    socket.on("leaveProject", ({ projectId, userId }) => {
       const room = `project:${projectId}`;
       socket.leave(room);
+
+      const users = projectPresence.get(projectId);
+      users?.delete(userId);
+
+      io?.to(room).emit("presenceUpdate", {
+        projectId,
+        users: Array.from(users || []),
+      });
     });
 
     socket.on("disconnect", () => {
