@@ -6,6 +6,7 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { NextRequest, NextResponse } from "next/server";
 import { updateTaskSchema } from "@/validators/taskValidator";
 import { validateRequest } from "@/middleware/validationMiddleware";
+import { getIO } from "@/lib/socket";
 
 export const GET = asyncHandler(
   async (req: NextRequest, { params }: { params: { id: string } }) => {
@@ -43,6 +44,9 @@ export const PATCH = asyncHandler(
       throw new ApiError(404, "Task not found");
     }
 
+    const io = getIO();
+    io.to(`project:${task?.projectId}`).emit("taskUpdated", task);
+
     return NextResponse.json({
       success: true,
       task,
@@ -62,6 +66,11 @@ export const DELETE = asyncHandler(
     if (!task) {
       throw new ApiError(404, "Task not found");
     }
+
+    const io = getIO();
+    io.to(`project:${task?.projectId}`).emit("taskDeleted", {
+      taskId: id,
+    });
 
     return NextResponse.json({
       success: true,

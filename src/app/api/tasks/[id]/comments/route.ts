@@ -7,6 +7,7 @@ import { commentSchema } from "@/validators/taskValidator";
 import { ApiError } from "@/utils/apiError";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { Types } from "mongoose";
+import { getIO } from "@/lib/socket";
 
 export const POST = asyncHandler(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -31,6 +32,12 @@ export const POST = asyncHandler(
 
     await task.save();
 
+    const io = getIO();
+    io.to(`project:${task.projectId}`).emit("commentAdded", {
+      taskId: task._id,
+      comment: task.comments[task.comments.length - 1],
+    });
+    
     const populatedTask = await Task.findById(id).populate(
       "comments.user",
       "name email"
