@@ -17,6 +17,9 @@ export const GET = asyncHandler(
     const status = searchParams.get("status");
     const assignee = searchParams.get("assignee");
 
+    const cursor = searchParams.get("cursor");
+    const limit = Number(searchParams.get("limit")) || 20;
+
     const { id } = await params;
     const project = await Project.findById(id);
 
@@ -44,15 +47,24 @@ export const GET = asyncHandler(
       query.assignees = assignee;
     }
 
+    if (cursor) {
+      query.createdAt = { $lt: new Date(cursor) };
+    }
+
     const tasks = await Task.find(query)
-      .populate("assignees", "name email")
       .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate("assignees", "name email")
       .lean();
+
+    const nextCursor =
+      tasks.length > 0 ? tasks[tasks.length - 1].createdAt : null;
 
     return NextResponse.json({
       success: true,
       count: tasks.length,
       tasks,
+      nextCursor,
     });
   }
 );
