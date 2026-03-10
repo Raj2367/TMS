@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import CreateProjectModal from "@/components/projects/CreateProjectModal";
 
 import api from "@/lib/api";
 import { Project } from "@/types";
@@ -11,6 +12,7 @@ export default function ProjectsPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -28,6 +30,9 @@ export default function ProjectsPage() {
     fetchProjects();
   }, []);
 
+  const handleCreated = (project: Project) => {
+    setProjects((prev) => [project, ...prev]);
+  };
   if (loading) {
     return <div className="text-center">Loading projects...</div>;
   }
@@ -38,7 +43,7 @@ export default function ProjectsPage() {
         <h1 className="text-3xl font-bold">Projects</h1>
 
         <button
-          onClick={() => router.push("/dashboard/projects/new")}
+          onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded"
         >
           New Project
@@ -64,6 +69,11 @@ export default function ProjectsPage() {
           </div>
         ))}
       </div>
+      <CreateProjectModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onCreated={handleCreated}
+      />
     </div>
   );
 }
