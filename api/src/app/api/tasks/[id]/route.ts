@@ -44,7 +44,16 @@ export const PATCH = asyncHandler(
       throw new ApiError(404, "Task not found");
     }
 
-    await emitSocketEvent(`project:${task?.projectId}`, "taskUpdated", task);
+    const populatedTask = await Task.findById(id)
+      .populate("assignees", "name email")
+      .populate("comments.user", "name email")
+      .lean();
+
+    await emitSocketEvent(
+      `project:${populatedTask!.projectId}`,
+      "taskUpdated",
+      populatedTask
+    );
 
     return NextResponse.json({
       success: true,
@@ -66,8 +75,10 @@ export const DELETE = asyncHandler(
       throw new ApiError(404, "Task not found");
     }
 
-    await emitSocketEvent(`project:${task?.projectId}`, "taskDeleted", { taskId: id });
-    
+    await emitSocketEvent(`project:${task?.projectId}`, "taskDeleted", {
+      taskId: id,
+    });
+
     return NextResponse.json({
       success: true,
       message: "Task deleted",

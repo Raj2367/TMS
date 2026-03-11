@@ -23,7 +23,7 @@ export default function ProjectDashboardPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Presence — gives you an array of online user IDs
-  const onlineUsers = usePresence(projectId, user?._id);
+  const onlineUsers = usePresence(projectId, user?.name);
 
   useEffect(() => {
     const fetchTasks = async () => {
