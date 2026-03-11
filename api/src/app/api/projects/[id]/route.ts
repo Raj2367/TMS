@@ -6,12 +6,13 @@ import { ApiError } from "@/utils/apiError";
 import { asyncHandler } from "@/utils/asyncHandler";
 
 export const GET = asyncHandler(
-  async (req: NextRequest, { params }: { params: { id: string } }) => {
+  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const user = authenticate(req);
 
     await connectDB();
 
-    const project = await Project.findById(params.id)
+    const { id } = await params;
+    const project = await Project.findById(id)
       .populate("members", "name email")
       .populate("owner", "name email");
 

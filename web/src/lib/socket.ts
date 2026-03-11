@@ -4,6 +4,9 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 
+// Track current room so we can rejoin on reconnect
+let currentRoom: { projectId: string; userId: string } | null = null;
+
 export function getSocket(): Socket {
   if (!socket) {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3002", {
@@ -15,6 +18,12 @@ export function getSocket(): Socket {
 
     socket.on("connect", () => {
       console.log("✅ Socket connected:", socket?.id);
+
+      // Rejoin room after reconnection
+      if (currentRoom) {
+        console.log("🔄 Rejoining room after reconnect");
+        socket?.emit("joinProject", currentRoom);
+      }
     });
 
     socket.on("disconnect", (reason) => {
@@ -32,8 +41,8 @@ export function getSocket(): Socket {
 export function joinProjectRoom(projectId: string, userId: string) {
   const s = getSocket();
 
-  // If already connected, emit immediately
-  // If not yet connected, wait for connection then emit
+  currentRoom = { projectId, userId };
+
   if (s.connected) {
     s.emit("joinProject", { projectId, userId });
   } else {
@@ -46,6 +55,7 @@ export function joinProjectRoom(projectId: string, userId: string) {
 export function leaveProjectRoom(projectId: string, userId: string) {
   const s = getSocket();
   s.emit("leaveProject", { projectId, userId });
+  currentRoom = null;
 }
 
 export function onSocketEvent(

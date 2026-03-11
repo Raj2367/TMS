@@ -36,15 +36,26 @@ export const POST = asyncHandler(
       throw new ApiError(403, "User not part of this project");
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      id,
-      {
-        $addToSet: { assignees: userId },
-      },
-      { new: true }
+    const isAssigned = task.assignees.some(
+      (id: any) => id.toString() === userId
     );
 
-    await emitSocketEvent(`project:${task?.projectId}`, "taskAssigned", updatedTask);
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      isAssigned
+        ? { $pull: { assignees: userId } }
+        : { $addToSet: { assignees: userId } },
+      { new: true }
+    )
+      .populate("assignees", "name email")
+      .populate("comments.user", "name email")
+      .lean();
+
+    await emitSocketEvent(
+      `project:${updatedTask!.projectId}`,
+      "taskUpdated",
+      updatedTask
+    );
 
     return NextResponse.json({
       success: true,

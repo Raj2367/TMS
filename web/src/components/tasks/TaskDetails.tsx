@@ -1,14 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Task } from "@/types";
 import TaskComments from "./TaskComments";
+import AssignUserModal from "./AssignUserModal";
+import { onSocketEvent, offSocketEvent } from "@/lib/socket";
 
 interface Props {
   task: Task | null;
   onClose: () => void;
 }
 
-export default function TaskDetails({ task, onClose }: Props) {
+export default function TaskDetails({ task: initialTask, onClose }: Props) {
+  const [task, setTask] = useState<Task | null>(initialTask);
+  const [assignOpen, setAssignOpen] = useState(false);
+
+  // Sync when parent passes a new task
+  useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
+
+  // Listen for real-time updates to THIS task
+  useEffect(() => {
+    if (!task) return;
+
+    const handleTaskUpdated = (updatedTask: Task) => {
+      if (updatedTask._id === task._id) {
+        setTask(updatedTask);
+      }
+    };
+
+    onSocketEvent("taskUpdated", handleTaskUpdated);
+
+    return () => {
+      offSocketEvent("taskUpdated", handleTaskUpdated);
+    };
+  }, [task?._id]);
+
   if (!task) return null;
 
   return (
@@ -26,16 +54,26 @@ export default function TaskDetails({ task, onClose }: Props) {
 
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Status</h3>
-
           <span className="bg-gray-200 px-2 py-1 rounded text-sm">
             {task.status}
           </span>
         </div>
 
         <div className="mb-6">
-          <h3 className="font-semibold mb-2">Assignees</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Assignees</h3>
+            <button
+              onClick={() => setAssignOpen(true)}
+              className="text-sm text-blue-600 cursor-pointer"
+            >
+              Manage Assignees
+            </button>
+          </div>
 
           <div className="flex gap-2 flex-wrap">
+            {task.assignees.length === 0 && (
+              <p className="text-sm text-gray-500">No assignees</p>
+            )}
             {task.assignees.map((user) => (
               <div
                 key={user._id}
@@ -47,11 +85,15 @@ export default function TaskDetails({ task, onClose }: Props) {
           </div>
         </div>
 
-        <div>
-          <div className="space-y-3">
-            <TaskComments task={task} />
-          </div>
-        </div>
+        <TaskComments task={task} />
+
+        <AssignUserModal
+          open={assignOpen}
+          task={task}
+          projectId={task.projectId}
+          onClose={() => setAssignOpen(false)}
+          onTaskUpdate={(updatedTask) => setTask(updatedTask)}
+        />
       </div>
     </div>
   );
