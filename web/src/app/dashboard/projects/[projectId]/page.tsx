@@ -9,6 +9,7 @@ import { onSocketEvent, offSocketEvent } from "@/lib/socket";
 import { usePresence } from "@/hooks/usePresence";
 import { useAuth } from "@/context/AuthContext";
 import TaskBoard from "@/components/tasks/TaskBoard";
+import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 
 export default function ProjectDashboardPage() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function ProjectDashboardPage() {
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
 
   // Presence — gives you an array of online user IDs
   const onlineUsers = usePresence(projectId, user?._id);
@@ -65,7 +67,16 @@ export default function ProjectDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Project Dashboard</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Projects Dashboard</h1>
+
+        <button
+          onClick={() => setShowCreate(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          New Task
+        </button>
+      </div>
 
       {/* Online presence indicator */}
       <div className="mb-6 flex items-center gap-2">
@@ -85,11 +96,17 @@ export default function ProjectDashboardPage() {
         </div>
       </div>
 
-      {tasks.length === 0 && <p className="text-gray-500">No tasks yet</p>}
-
-      <div className="space-y-4">
+      {tasks.length === 0 ? (
+        <p className="text-gray-500">No tasks yet</p>
+      ) : (
         <TaskBoard tasks={tasks} />
-      </div>
+      )}
+
+      <CreateTaskModal
+        open={showCreate}
+        projectId={projectId}
+        onClose={() => setShowCreate(false)}
+      />
     </div>
   );
 }
