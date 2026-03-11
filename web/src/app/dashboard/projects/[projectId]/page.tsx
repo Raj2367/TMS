@@ -10,6 +10,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { useAuth } from "@/context/AuthContext";
 import TaskBoard from "@/components/tasks/TaskBoard";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
+import TaskDetails from "@/components/tasks/TaskDetails";
 
 export default function ProjectDashboardPage() {
   const params = useParams();
@@ -19,6 +20,7 @@ export default function ProjectDashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Presence — gives you an array of online user IDs
   const onlineUsers = usePresence(projectId, user?._id);
@@ -99,8 +101,15 @@ export default function ProjectDashboardPage() {
       {tasks.length === 0 ? (
         <p className="text-gray-500">No tasks yet</p>
       ) : (
-        <TaskBoard tasks={tasks} />
+        <TaskBoard
+          tasks={tasks}
+          onTaskClick={(task) => setSelectedTask(task)}
+        />
       )}
+
+      {/* {selectedTask && ( */}
+      <TaskDetails task={selectedTask} onClose={() => setSelectedTask(null)} />
+      {/* )} */}
 
       <CreateTaskModal
         open={showCreate}

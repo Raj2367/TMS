@@ -4,6 +4,7 @@ import { Task } from "@/types";
 
 interface Props {
   tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
 function groupTasks(tasks: Task[]) {
@@ -14,9 +15,12 @@ function groupTasks(tasks: Task[]) {
   };
 }
 
-function TaskCard({ task }: { task: Task }) {
+function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border">
+    <div
+      onClick={onClick}
+      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow"
+    >
       <h4 className="font-semibold">{task.title}</h4>
 
       {task.description && (
@@ -34,30 +38,46 @@ function TaskCard({ task }: { task: Task }) {
   );
 }
 
-function Column({ title, tasks }: { title: string; tasks: Task[] }) {
+function Column({
+  title,
+  tasks,
+  onTaskClick,
+}: {
+  title: string;
+  tasks: Task[];
+  onTaskClick?: (task: Task) => void;
+}) {
   return (
     <div className="flex-1">
       <h3 className="font-semibold mb-4">{title}</h3>
 
       <div className="space-y-3">
         {tasks.map((task) => (
-          <TaskCard key={task._id} task={task} />
+          <TaskCard
+            key={task._id}
+            task={task}
+            onClick={() => onTaskClick?.(task)}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-export default function TaskBoard({ tasks }: Props) {
+export default function TaskBoard({ tasks, onTaskClick }: Props) {
   const grouped = groupTasks(tasks);
 
   return (
     <div className="grid grid-cols-3 gap-6">
-      <Column title="Todo" tasks={grouped.todo} />
+      <Column title="Todo" tasks={grouped.todo} onTaskClick={onTaskClick} />
 
-      <Column title="In Progress" tasks={grouped.inProgress} />
+      <Column
+        title="In Progress"
+        tasks={grouped.inProgress}
+        onTaskClick={onTaskClick}
+      />
 
-      <Column title="Done" tasks={grouped.done} />
+      <Column title="Done" tasks={grouped.done} onTaskClick={onTaskClick} />
     </div>
   );
 }
