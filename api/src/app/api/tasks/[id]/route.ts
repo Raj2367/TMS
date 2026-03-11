@@ -6,7 +6,7 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { NextRequest, NextResponse } from "next/server";
 import { updateTaskSchema } from "@/validators/taskValidator";
 import { validateRequest } from "@/middleware/validationMiddleware";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socketEmitter";
 
 export const GET = asyncHandler(
   async (req: NextRequest, { params }: { params: { id: string } }) => {
@@ -44,8 +44,7 @@ export const PATCH = asyncHandler(
       throw new ApiError(404, "Task not found");
     }
 
-    const io = getIO();
-    io.to(`project:${task?.projectId}`).emit("taskUpdated", task);
+    await emitSocketEvent(`project:${task?.projectId}`, "taskUpdated", task);
 
     return NextResponse.json({
       success: true,
@@ -67,11 +66,8 @@ export const DELETE = asyncHandler(
       throw new ApiError(404, "Task not found");
     }
 
-    const io = getIO();
-    io.to(`project:${task?.projectId}`).emit("taskDeleted", {
-      taskId: id,
-    });
-
+    await emitSocketEvent(`project:${task?.projectId}`, "taskDeleted", { taskId: id });
+    
     return NextResponse.json({
       success: true,
       message: "Task deleted",

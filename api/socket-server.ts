@@ -1,7 +1,39 @@
-import { createServer } from "http";
+import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Server, Socket } from "socket.io";
 
-const httpServer = createServer();
+const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
+  // Internal API for emitting events from Next.js API routes
+  if (req.method === "POST" && req.url === "/emit") {
+    let body = "";
+
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const { room, event, data } = JSON.parse(body);
+
+        if (!room || !event) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: "room and event are required" }));
+          return;
+        }
+
+        io.to(room).emit(event, data);
+
+        console.log(`📡 Emitted "${event}" to room "${room}"`);
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true }));
+      } catch (error) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: "Failed to emit" }));
+      }
+    });
+
+    return;
+  }
+
+  res.writeHead(404);
+  res.end();
+});
 
 const io = new Server(httpServer, {
   cors: {

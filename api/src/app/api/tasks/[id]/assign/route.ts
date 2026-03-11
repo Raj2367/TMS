@@ -5,7 +5,7 @@ import Project from "@/models/Project";
 import { authenticate } from "@/middleware/authMiddleware";
 import { ApiError } from "@/utils/apiError";
 import { asyncHandler } from "@/utils/asyncHandler";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socketEmitter";
 
 export const POST = asyncHandler(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -44,8 +44,7 @@ export const POST = asyncHandler(
       { new: true }
     );
 
-    const io = getIO();
-    io.to(`project:${task.projectId}`).emit("taskAssigned", updatedTask);
+    await emitSocketEvent(`project:${task?.projectId}`, "taskAssigned", updatedTask);
 
     return NextResponse.json({
       success: true,

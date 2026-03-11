@@ -7,7 +7,7 @@ import { createTaskSchema } from "@/validators/taskValidator";
 import { validateRequest } from "@/middleware/validationMiddleware";
 import { ApiError } from "@/utils/apiError";
 import { asyncHandler } from "@/utils/asyncHandler";
-import { getIO } from "@/lib/socket";
+import { emitSocketEvent } from "@/lib/socketEmitter";
 
 export const POST = asyncHandler(async (req: NextRequest) => {
   const user = authenticate(req);
@@ -36,8 +36,7 @@ export const POST = asyncHandler(async (req: NextRequest) => {
     description: data.description,
   });
 
-  const io = getIO();
-  io.to(`project:${data.projectId}`).emit("taskCreated", task);
+  await emitSocketEvent(`project:${data.projectId}`, "taskCreated", task);
 
   return NextResponse.json({
     success: true,
