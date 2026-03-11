@@ -8,6 +8,7 @@ import { Task } from "@/types";
 import { onSocketEvent, offSocketEvent } from "@/lib/socket";
 import { usePresence } from "@/hooks/usePresence";
 import { useAuth } from "@/context/AuthContext";
+import TaskBoard from "@/components/tasks/TaskBoard";
 
 export default function ProjectDashboardPage() {
   const params = useParams();
@@ -87,12 +88,7 @@ export default function ProjectDashboardPage() {
       {tasks.length === 0 && <p className="text-gray-500">No tasks yet</p>}
 
       <div className="space-y-4">
-        {tasks.map((task) => (
-          <div key={task._id} className="bg-white p-4 rounded shadow">
-            <h3>{task.title}</h3>
-            <p className="text-sm text-gray-500">{task.status}</p>
-          </div>
-        ))}
+        <TaskBoard tasks={tasks} />
       </div>
     </div>
   );
