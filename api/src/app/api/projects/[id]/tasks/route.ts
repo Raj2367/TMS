@@ -54,6 +54,7 @@ export const GET = asyncHandler(
     const tasks = await Task.find(query)
       .sort({ createdAt: -1 })
       .limit(limit)
+      .populate("comments.user", "name email")
       .populate("assignees", "name email")
       .lean();
 

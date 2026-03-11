@@ -1,6 +1,7 @@
 "use client";
 
 import { Task } from "@/types";
+import TaskComments from "./TaskComments";
 
 interface Props {
   task: Task | null;
@@ -47,20 +48,8 @@ export default function TaskDetails({ task, onClose }: Props) {
         </div>
 
         <div>
-          <h3 className="font-semibold mb-3">Comments</h3>
-
-          {task.comments.length === 0 && (
-            <p className="text-sm text-gray-500">No comments yet</p>
-          )}
-
           <div className="space-y-3">
-            {task.comments.map((comment, index) => (
-              <div key={index} className="bg-gray-100 p-3 rounded">
-                <p className="text-sm font-semibold">{comment.user.name}</p>
-
-                <p className="text-sm text-gray-700">{comment.message}</p>
-              </div>
-            ))}
+            <TaskComments task={task} />
           </div>
         </div>
       </div>
