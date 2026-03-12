@@ -6,17 +6,17 @@ Full stack collaborative project management system with realtime updates.
 
 ## Installation
 
-### 1 Clone repository
+### 1. Clone repository
 
-git clone <repo-url>
+git clone https://github.com/Raj2367/TMS.git
 
-cd task-manager
+cd TMS
 
 ---
 
-### 2 Backend Setup
+### 2. Backend Setup
 
-cd backend
+cd api
 
 npm install
 
@@ -27,24 +27,26 @@ JWT_SECRET=secret
 
 Run server
 
-npm run dev
+npm run dev:all
 
 ---
 
-### 3 Frontend Setup
+### 3. Frontend Setup
 
-cd frontend
+cd web
 
 npm install
 
 Create `.env.local`
 
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
-NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3002
 
 Run frontend
 
 npm run dev
+
+open http://localhost:3001 for Login / Register
 
 ---
 
