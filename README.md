@@ -116,6 +116,55 @@ Search
 GET /api/search?q=
 
 ---
+## Design Decisions
+### 1. WebSockets for Real-Time Updates
+
+Socket.io was used to allow multiple users to collaborate on the same project dashboard.
+
+Advantages:
+- instant updates
+- reduced polling
+- scalable with Redis adapter
+
+### 2. Project-Based Socket Rooms
+
+Each project has its own room.
+
+Example:
+project:123
+
+Benefits:
+- events scoped to project members
+- prevents unnecessary broadcasts
+- reduces network traffic
+
+### 3. MongoDB Schema Design
+
+Tasks reference projects using projectId.
+
+Indexes used:
+- projectId
+- createdAt
+- text index (title, description, comments)
+
+Benefits:
+- fast dashboard queries
+- efficient search
+
+### 4. Cursor-Based Pagination
+
+Task lists use cursor-based pagination instead of offset pagination.
+
+Advantages:
+- scalable for large datasets
+- avoids performance degradation with large offsets
+
+### 5. DTO Pattern
+
+Database models are not directly returned to clients.
+Instead, responses are formatted to avoid leaking internal schema details.
+
+---
 
 ## Future Improvements
 
