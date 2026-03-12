@@ -25,7 +25,7 @@ function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
       draggable
       onDragStart={handleDragStart}
       onClick={onClick}
-      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow"
+      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition"
     >
       <h4 className="font-semibold">{task.title}</h4>
 

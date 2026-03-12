@@ -57,7 +57,7 @@ export default function CreateTaskModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center animate-fadeIn">
       <div className="bg-white p-6 rounded-xl w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Create Task</h2>
 
