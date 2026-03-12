@@ -6,6 +6,8 @@ import CreateProjectModal from "@/components/projects/CreateProjectModal";
 
 import api from "@/lib/api";
 import { Project } from "@/types";
+import { parseApiError } from "@/utils/errorHandler";
+import { logError } from "@/utils/errorLogger";
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -13,6 +15,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -20,8 +23,10 @@ export default function ProjectsPage() {
         const res = await api.get("/projects");
 
         setProjects(res.data.projects);
-      } catch (error) {
-        console.error("Failed to load projects");
+      } catch (err: any) {
+        logError(err);
+        const parsed = parseApiError(err);
+        setError(parsed.message);
       } finally {
         setLoading(false);
       }

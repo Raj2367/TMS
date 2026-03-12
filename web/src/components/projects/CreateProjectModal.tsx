@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import api from "@/lib/api";
+import { parseApiError } from "@/utils/errorHandler";
+import { logError } from "@/utils/errorLogger";
 
 interface Props {
   open: boolean;
@@ -40,7 +42,9 @@ export default function CreateProjectModal({
 
       onClose();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to create project");
+      logError(err);
+      const parsed = parseApiError(err);
+      setError(parsed.message);
     } finally {
       setLoading(false);
     }

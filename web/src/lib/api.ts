@@ -1,3 +1,5 @@
+import { parseApiError } from "@/utils/errorHandler";
+import { logError } from "@/utils/errorLogger";
 import axios from "axios";
 
 const api = axios.create({
@@ -40,8 +42,9 @@ api.interceptors.response.use(
         window.location.href = "/login";
       }
     }
-
-    return Promise.reject(error);
+    const parsed = parseApiError(error);
+    logError(parsed);
+    return Promise.reject(parsed);
   }
 );
 

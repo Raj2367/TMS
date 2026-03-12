@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api, { setToken, removeToken, getToken } from "@/lib/api";
 import { User } from "@/types";
+import { parseApiError } from "@/utils/errorHandler";
+import { logError } from "@/utils/errorLogger";
 
 interface AuthContextType {
   user: User | null;
@@ -17,7 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState("");
   useEffect(() => {
     const loadUser = async () => {
       const token = getToken();
@@ -31,9 +33,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Fetch real user data from your backend
         const res = await api.get("/auth/me");
         setUser(res.data.user);
-      } catch (error) {
+      } catch (err: any) {
+        logError(err);
         // Token is invalid or expired — clean up
-        console.error("Failed to load user:", error);
+        const parsed = parseApiError(err);
+        setError(parsed.message);
         removeToken();
         setUser(null);
       } finally {

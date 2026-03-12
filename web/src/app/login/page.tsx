@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { parseApiError } from "@/utils/errorHandler";
+import { logError } from "@/utils/errorLogger";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -24,7 +26,9 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Login failed");
+      logError(err);
+      const parsed = parseApiError(err);
+      setError(parsed.message);
     } finally {
       setLoading(false);
     }
