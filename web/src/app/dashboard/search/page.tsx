@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import api from "@/lib/api";
 import { Task } from "@/types";
+import Loader from "@/components/ui/Loader";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function SearchPage() {
         className="w-full border p-3 rounded mb-6"
       />
 
-      {loading && <p className="text-sm text-gray-500">Searching...</p>}
+      {loading && <Loader />}
 
       <div className="space-y-4">
         {results.length === 0 && query && !loading && (

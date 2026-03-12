@@ -8,6 +8,7 @@ import api from "@/lib/api";
 import { Project } from "@/types";
 import { parseApiError } from "@/utils/errorHandler";
 import { logError } from "@/utils/errorLogger";
+import Loader from "@/components/ui/Loader";
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function ProjectsPage() {
     setProjects((prev) => [project, ...prev]);
   };
   if (loading) {
-    return <div className="text-center">Loading projects...</div>;
+    return <Loader />;
   }
 
   return (

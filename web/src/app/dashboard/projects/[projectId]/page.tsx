@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import TaskBoard from "@/components/tasks/TaskBoard";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 import TaskDetails from "@/components/tasks/TaskDetails";
+import Loader from "@/components/ui/Loader";
 
 export default function ProjectDashboardPage() {
   const params = useParams();
@@ -64,7 +65,7 @@ export default function ProjectDashboardPage() {
   }, [projectId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   return (

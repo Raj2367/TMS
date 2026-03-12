@@ -66,7 +66,7 @@ function Column({
     e.preventDefault();
   };
   return (
-    <div onDrop={handleDrop} onDragOver={allowDrop} className="flex-1">
+    <div onDrop={handleDrop} onDragOver={allowDrop} className="flex-1 min-h-dvh">
       <h3 className="font-semibold mb-4">{title}</h3>
 
       <div className="space-y-3">

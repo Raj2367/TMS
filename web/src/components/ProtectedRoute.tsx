@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import Loader from "./ui/Loader";
 
 export default function ProtectedRoute({
   children,
@@ -21,7 +22,7 @@ export default function ProtectedRoute({
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+        <Loader size="lg" />
       </div>
     );
   }

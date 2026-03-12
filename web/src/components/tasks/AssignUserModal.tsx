@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 import api from "@/lib/api";
 import { User, Task } from "@/types";
+import Loader from "../ui/Loader";
 
 interface Props {
   open: boolean;
@@ -60,7 +61,7 @@ export default function AssignUserModal({
       <div className="bg-white p-6 rounded-xl w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4">Assign Users</h2>
 
-        {loading && <p className="text-sm text-gray-500">Loading members...</p>}
+        {loading && <Loader size="md" />}
 
         <div className="space-y-2">
           {members.map((user) => {
